@@ -6,6 +6,11 @@ const mongoose = require('mongoose');
 const M = require('../models');
 
 async function run() {
+  // Seeding WIPES every collection. Refuse to do that on a production-looking setup unless confirmed.
+  if (env.isProd && process.env.SEED_CONFIRM !== 'wipe') {
+    console.error('Refusing to seed: NODE_ENV=production and this script deletes ALL data.\nRe-run with SEED_CONFIRM=wipe if you really mean it.');
+    process.exit(1);
+  }
   await connectDb();
   await Promise.all(Object.values(M).map((m) => m.deleteMany({})));
   await Promise.all(Object.values(M).map((m) => m.syncIndexes()));

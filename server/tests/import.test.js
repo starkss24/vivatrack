@@ -43,3 +43,11 @@ test('CSV import rejects wrong file type, wrong header, oversized file, and non-
   const stu = await login(w.s1);
   expect((await upload(stu.agent, w.course._id, 'student_email,ta_email\n')).status).toBe(403);
 });
+
+test('error row numbers are real file line numbers even with blank lines', async () => {
+  const { agent } = await login(w.admin);
+  const csv = `student_email,ta_email\n\n${w.s1.email},${w.ta1.email}\n\nnobody@t.test,${w.ta1.email}\n`;
+  const res = await upload(agent, w.course._id, csv);
+  expect(res.body.created).toBe(1);
+  expect(res.body.errors.map((e) => e.row)).toEqual([5]);
+});

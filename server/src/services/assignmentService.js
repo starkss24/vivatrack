@@ -10,12 +10,12 @@ async function importCsv(courseId, buffer) {
 
   let rows;
   try {
-    rows = parse(buffer, { columns: (h) => h.map((c) => c.trim().toLowerCase()), skip_empty_lines: true, trim: true, bom: true, relax_column_count: true });
+    rows = parse(buffer, { columns: (h) => h.map((c) => c.trim().toLowerCase()), skip_empty_lines: true, trim: true, bom: true, relax_column_count: true, info: true });
   } catch (e) {
     throw badRequest(`Could not read CSV: ${e.message}`, undefined, 'CSV_PARSE_ERROR');
   }
   if (rows.length === 0) throw badRequest('CSV has no data rows');
-  const first = rows[0];
+  const first = rows[0].record;
   if (!('student_email' in first) || !('ta_email' in first)) {
     throw badRequest('CSV must have the columns: student_email,ta_email', undefined, 'CSV_BAD_HEADER');
   }
@@ -23,9 +23,9 @@ async function importCsv(courseId, buffer) {
   const result = { created: 0, skipped: 0, errors: [] };
 
   for (let i = 0; i < rows.length; i++) {
-    const rowNo = i + 2; // header is line 1
-    const sEmail = String(rows[i].student_email || '').toLowerCase();
-    const tEmail = String(rows[i].ta_email || '').toLowerCase();
+    const rowNo = rows[i].info.lines; // real line number in the file (blank lines are skipped by the parser)
+    const sEmail = String(rows[i].record.student_email || '').toLowerCase();
+    const tEmail = String(rows[i].record.ta_email || '').toLowerCase();
     const fail = (reason) => result.errors.push({ row: rowNo, reason });
     try {
       if (!EMAIL_RE.test(sEmail) || !EMAIL_RE.test(tEmail)) { fail('Missing or invalid email'); continue; }

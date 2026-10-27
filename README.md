@@ -100,7 +100,7 @@ To try chat, open two browser sessions (e.g. a normal and a private window): log
 2. **DNS / `querySrv ECONNREFUSED`** – `mongodb+srv://` needs DNS SRV lookups, which some Wi-Fi / college / ISP DNS servers block. The server now retries automatically with public DNS (8.8.8.8). If it still fails: run `npm run mongo:uri` (in `server`) on a network where it works and paste the printed non-SRV `mongodb://...` URI into `MONGO_URI`, **or** switch the laptop DNS to `8.8.8.8` / `1.1.1.1`, **or** use a phone hotspot.
 3. **Atlas "IP not whitelisted"** – in MongoDB Atlas > Network Access add the laptop's IP (or `0.0.0.0/0` for a demo).
 4. **Port 5173/5000 already in use** – change `PORT` (server) / `--port` (Vite) and keep `CLIENT_URL` and `VITE_API_URL` in sync. `CLIENT_URL` must exactly match the address in the browser (`localhost`, not `127.0.0.1`).
-5. After the first successful start, load demo data once with `npm run seed` (it wipes and recreates the data).
+5. After the first successful start, load demo data once with `npm run seed` (it wipes and recreates the data). With `NODE_ENV=production` the seed refuses to run unless you also set `SEED_CONFIRM=wipe`.
 
 ## Environment Variables
 
