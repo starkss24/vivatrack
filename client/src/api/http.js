@@ -1,6 +1,9 @@
 import axios from 'axios';
 
-export const API_URL = (import.meta.env.VITE_API_URL || 'http://localhost:5000').replace(/\/$/, '');
+// Dev: talk to the API directly (VITE_API_URL). Production: always same-origin ('' => /api, /socket.io);
+// the host (client/vercel.json) proxies those paths to the backend. That makes the auth cookie
+// first-party, so it isn't dropped by Safari / Firefox / incognito "block third-party cookies".
+export const API_URL = import.meta.env.PROD ? '' : (import.meta.env.VITE_API_URL || 'http://localhost:5000').replace(/\/$/, '');
 
 export const http = axios.create({ baseURL: `${API_URL}/api`, withCredentials: true, timeout: 20000 });
 

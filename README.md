@@ -114,13 +114,15 @@ To try chat, open two browser sessions (e.g. a normal and a private window): log
 | `JWT_EXPIRES_IN` | Token lifetime, e.g. `7d` |
 | `CLIENT_URL` | Exact frontend origin, e.g. `https://your-app.vercel.app`. Used for CORS **and** Socket.io CORS (credentials on) |
 | `NODE_ENV` | `development` / `production` / `test` |
+| `TRUST_PROXY` | Proxy hops in front of the API (1 = Render only, 2 = Render + Vercel proxy) |
+| `DISABLE_RATE_LIMIT` | `true` turns off login/chat rate limits (local testing only) |
 | `SEED_PASSWORD` | Password given to every seeded demo user |
 
 **Client (`client/.env`)**
 
 | Variable | Purpose |
 | --- | --- |
-| `VITE_API_URL` | Backend base URL, no trailing slash and no `/api` |
+| `VITE_API_URL` | Backend base URL for **local development only** (production uses the Vercel proxy) |
 | `VITE_SHOW_DEMO_HINT` | `true` shows the demo logins on the login page |
 
 ## Demo Accounts
@@ -152,7 +154,7 @@ Live links (to be filled in): Frontend **`<vercel-url>`** · Backend **`<render-
 2. **Backend on Render** – new *Web Service* from this repo, root directory `server`, build `npm install`, start `npm start`, health check path `/health`. Set `MONGO_URI`, `JWT_SECRET`, `CLIENT_URL` (the Vercel URL), `NODE_ENV=production`, `JWT_EXPIRES_IN`. Run `npm run seed` once from the Render shell (or locally with the Atlas URI) to load demo data.
 3. **Frontend on Vercel** – import the repo, root directory `client`, framework Vite. Set `VITE_API_URL` to the Render URL (and `VITE_SHOW_DEMO_HINT=true` if you want the hint). `client/vercel.json` rewrites all paths to `index.html` so React Router deep links work.
 
-**Cross-site cookie.** Vercel and Render are different sites, so the auth cookie must be `SameSite=None; Secure` in production (set in `server/src/utils/token.js`), the server calls `app.set('trust proxy', 1)` because Render terminates TLS, and CORS allows **only** `CLIENT_URL` with `credentials: true` (same for Socket.io). Axios and Socket.io both send `withCredentials`. In development the cookie is `SameSite=Lax`, which works because `localhost` ports are the same site.
+**Cookies and the Vercel proxy.** Vercel and Render are different sites, so a cookie set directly by Render would be a *third-party* cookie that Safari, Firefox and incognito windows block. To avoid that, the production client always calls **same-origin** paths (`/api/...`, `/socket.io/...`) and `client/vercel.json` rewrites those to the Render URL. The browser therefore only ever talks to the Vercel domain and the auth cookie is first-party (still `HttpOnly; Secure`, set in `server/src/utils/token.js`). Consequences: `VITE_API_URL` is only used in development; if your Render service has a different URL, edit the two `destination`s in `client/vercel.json`. Vercel cannot tunnel WebSockets, so in production Socket.io uses long-polling (still live, just HTTP). The server still calls `app.set('trust proxy', env.trustProxy)`; set `TRUST_PROXY=2` on Render (Render's proxy + Vercel's) so rate limits see real client IPs. CORS stays locked to `CLIENT_URL` for any direct calls.
 
 **Cold starts.** Render's free tier sleeps when idle, so the first request and the first socket connection can take 30–60 s. The UI shows "Connecting…/Reconnecting…" meanwhile and REST sending keeps working.
 

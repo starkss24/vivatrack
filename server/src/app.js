@@ -8,7 +8,9 @@ const { errorHandler, notFoundHandler } = require('./middleware/errorHandler');
 
 function createApp() {
   const app = express();
-  app.set('trust proxy', 1); // Render terminates TLS; needed for secure cookies + correct client IPs
+  // Hops in front of the app: Render's proxy (1). Behind the Vercel proxy as well, set TRUST_PROXY=2 so
+  // rate limits see the real client IP instead of Vercel's shared egress IP.
+  app.set('trust proxy', env.trustProxy);
   app.disable('x-powered-by');
 
   app.use(helmet());

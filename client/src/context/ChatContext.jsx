@@ -14,7 +14,9 @@ export function ChatProvider({ children }) {
 
   useEffect(() => {
     let everConnected = false;
-    const socket = io(API_URL, { withCredentials: true, transports: ['polling', 'websocket'] });
+    // Behind the Vercel proxy WebSockets can't be tunnelled, so production uses long-polling (still live).
+    const transports = import.meta.env.PROD ? ['polling'] : ['polling', 'websocket'];
+    const socket = io(API_URL || undefined, { withCredentials: true, transports });
     const down = () => setStatus(everConnected ? 'reconnecting' : 'connecting');
 
     socket.on('connect', () => {

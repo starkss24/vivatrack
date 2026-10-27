@@ -15,6 +15,7 @@ const env = {
   clientUrls: (process.env.CLIENT_URL || 'http://localhost:5173').split(',').map((s) => s.trim()).filter(Boolean),
   // Rate limits are skipped in tests, or when DISABLE_RATE_LIMIT=true (local demo/test data only; keep off in production).
   rateLimitDisabled: nodeEnv === 'test' || process.env.DISABLE_RATE_LIMIT === 'true',
+  trustProxy: Number(process.env.TRUST_PROXY) || 1,
   seedPassword: process.env.SEED_PASSWORD || 'Demo@1234',
 };
 
