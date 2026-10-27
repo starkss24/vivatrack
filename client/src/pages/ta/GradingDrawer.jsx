@@ -56,7 +56,7 @@ export default function GradingDrawer({ course, session, row, onClose, onChanged
       <div className="space-y-6">
         <p className="text-sm text-muted">{row.student.rollNo} · {row.student.email}</p>
 
-        <form onSubmit={save} className="space-y-4">
+        <form onSubmit={save} noValidate className="space-y-4">
           <div role="radiogroup" aria-label="Attendance" className="grid grid-cols-2 gap-1 rounded-full bg-neutral-100 p-1 text-sm font-medium">
             {['present', 'absent'].map((a) => (
               <button type="button" key={a} role="radio" aria-checked={attendance === a} onClick={() => { setAttendance(a); setErr({}); }}
