@@ -1,5 +1,12 @@
 # VivaTrack
 
+## Demo
+
+![VivaTrack demo preview](docs/demo/vivatrack-demo-preview.gif)
+
+▶ [Watch the full walkthrough with voiceover (3:50)](docs/demo/vivatrack-demo-720p.mp4)
+&nbsp;·&nbsp; Live app: [vivatrack-two.vercel.app](https://vivatrack-two.vercel.app)
+
 ## Problem Statement
 
 Lab sessions at our college run per course (e.g. a MERN course has 6 sessions). Students give **in-person vivas** to TAs, and management pre-assigns a fixed set of students to each TA. If the course is currently at session 4, a student can give vivas for sessions 1–4, never 5 or 6. The vivas happen offline; there is no single reliable place for the marks and attendance, no way to flag struggling students, no private channel to report a TA problem, and no direct line between a student and their TA.
@@ -148,7 +155,7 @@ Uses Jest + Supertest + mongodb-memory-server (an in-memory MongoDB, no setup ne
 
 ## Deployment
 
-Live links (to be filled in): Frontend **`<vercel-url>`** · Backend **`<render-url>`** · Database: MongoDB Atlas.
+Live links: Frontend **<https://vivatrack-two.vercel.app>** · Backend **<https://vivatrack-api.onrender.com>** · Database: MongoDB Atlas.
 
 1. **MongoDB Atlas** – create a free cluster and a DB user. In *Network Access* allow Render to connect (simplest for a demo: `0.0.0.0/0`; Render's free tier has no fixed IPs). Copy the connection string.
 2. **Backend on Render** – new *Web Service* from this repo, root directory `server`, build `npm install`, start `npm start`, health check path `/health`. Set `MONGO_URI`, `JWT_SECRET`, `CLIENT_URL` (the Vercel URL), `NODE_ENV=production`, `JWT_EXPIRES_IN`. Run `npm run seed` once from the Render shell (or locally with the Atlas URI) to load demo data.
